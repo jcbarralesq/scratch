@@ -9,9 +9,9 @@ const SCRATCH_CLI_PATH_PLACEHOLDER = '__SCRATCH_CLI_PATH__';
 
 // Command definitions
 const COMMANDS = {
-  init: {
+  new: {
     description: 'Create a new project from a template',
-    usage: '/scratch:init [template] [project-name] [options]'
+    usage: '/scratch:new [template] [project-name] [options]'
   },
   list: {
     description: 'List available templates',

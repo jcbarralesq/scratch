@@ -240,9 +240,9 @@ async function main() {
       }
     });
   
-  // === gen init ===
+  // === scratch new (was: gen init) ===
   program
-    .command('init [template] [project-name]')
+    .command('new [template] [project-name]')
     .description('Create a new project from a template')
     .option('-p, --path <path>', 'Target directory')
     .option('-f, --force', 'Overwrite existing files')
@@ -399,6 +399,7 @@ async function main() {
         console.log();
         printSuccess('All done! Next steps:');
         console.log(`  cd ${projectName}`);
+        console.log('  Run: scratch init (to add slash commands)');
         console.log('  Open in your favorite editor');
         console.log('  Use the /scratch:* slash commands');
       } catch (err) {
@@ -796,9 +797,9 @@ async function main() {
       program.help();
     });
   
-  // === setup ===
+  // === scratch init (was: setup) ===
   program
-    .command('setup [editor]')
+    .command('init [editor]')
     .description('Install slash commands for editors (claude, cursor, vscode, all)')
     .option('--global', 'Install globally (default: project)')
     .option('--uninstall', 'Remove installed commands')
