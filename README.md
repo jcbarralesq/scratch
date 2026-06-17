@@ -2,7 +2,7 @@
 
 > _Build your next project from scratch._
 
-A template-driven project generator inspired by [Spec Kit](https://github.com/github/spec-kit). Create new projects from GitHub templates and automatically install slash commands for **Claude Code**, **Cursor**, and **VS Code**.
+A template-driven project generator. Create new projects from GitHub templates and automatically install slash commands for **Claude Code**, **Cursor**, and **VS Code**.
 
 [![GitHub stars](https://img.shields.io/github/stars/jcbarralesq/scratch?style=social)](https://github.com/jcbarralesq/scratch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -10,7 +10,6 @@ A template-driven project generator inspired by [Spec Kit](https://github.com/gi
 
 ## Table of Contents
 
-- [Why From Scratch?](#-why-from-scratch)
 - [Quick Start](#-quick-start)
 - [Installation](#-installation)
   - [Option 1: npx (no install)](#option-1-npx-no-install)
@@ -30,13 +29,11 @@ A template-driven project generator inspired by [Spec Kit](https://github.com/gi
 
 ## Why From Scratch?
 
-| | Spec Kit | From Scratch |
-|---|---|---|
-| **Written in** | Python | Node.js (no extra runtime) |
-| **Install via** | `uv tool install` | `npx` or `npm install -g` |
-| **Creates projects from** | Specs (templates) | GitHub repos or local dirs |
-| **Slash commands for** | 30+ AI agents | Claude Code, Cursor, VS Code |
-| **Template registry** | Built-in | Local + GitHub |
+- 🚀 **Zero-install usage** — `npx` and go
+- 🔌 **Multi-editor** — Claude Code, Cursor, VS Code
+- 📦 **GitHub or local templates** — flexible sources
+- 🌍 **Cross-platform** — Windows, macOS, Linux, WSL
+- 🪶 **Lightweight** — pure Node.js, no Python or other runtimes
 
 ## Quick Start
 
