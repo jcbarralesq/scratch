@@ -1,0 +1,178 @@
+# Default templates shipped with scratch
+# These are loaded automatically on first run
+
+templates:
+  - name: mcp-template
+    source: github
+    repo: despegar/mcp-template
+    branch: main
+    added: 2024-01-15
+    description: MCP template for Despegar implementations
+
+  - name: java-template
+    source: github
+    repo: despegar/java-template
+    branch: main
+    added: 2024-01-15
+    description: Java application template
+
+  - name: kotlin-template
+    source: github
+    repo: despegar/kotlin-template
+    branch: main
+    added: 2024-01-15
+    description: Kotlin application template
+
+  - name: nestjs-template
+    source: github
+    repo: despegar/nestjs-template
+    branch: main
+    added: 2024-01-15
+    description: NestJS application template
+
+  - name: react-template
+    source: github
+    repo: despegar/react-template
+    branch: main
+    added: 2024-01-15
+    description: React application template
+
+  - name: rust-axum-template
+    source: github
+    repo: despegar/rust-axum-template
+    branch: main
+    added: 2024-01-15
+    description: Rust app template with axum web server
+
+  - name: redis-template
+    source: github
+    repo: despegar/redis-template
+    branch: main
+    added: 2024-01-15
+    description: Redis configuration template
+
+  - name: jav-template
+    source: github
+    repo: despegar/jav-template
+    branch: main
+    added: 2024-01-15
+    description: JAV base template (Java)
+
+  - name: comm-template
+    source: github
+    repo: despegar/comm-template
+    branch: main
+    added: 2024-01-15
+    description: Spring Boot + Java template (comm team)
+
+  - name: chna-backend-template
+    source: github
+    repo: despegar/chna-backend-template
+    branch: main
+    added: 2024-01-15
+    description: Backend application template for Changes Non Air
+
+  - name: data-angular-template
+    source: github
+    repo: despegar/data-angular-template
+    branch: main
+    added: 2024-01-15
+    description: Angular data application template
+
+  - name: af-react-template
+    source: github
+    repo: despegar/af-react-template
+    branch: main
+    added: 2024-01-15
+    description: React template with Despegar best practices
+
+  - name: spark-guice-template
+    source: github
+    repo: despegar/spark-guice-template
+    branch: main
+    added: 2024-01-15
+    description: Kotlin Spark + Guice template (comm team)
+
+  - name: comm-infra-template
+    source: github
+    repo: despegar/comm-infra-template
+    branch: main
+    added: 2024-01-15
+    description: Spring Boot + Kotlin template (comm-infra)
+
+  - name: template-jenkins-pipeline
+    source: github
+    repo: despegar/template-jenkins-pipeline
+    branch: main
+    added: 2024-01-15
+    description: Jenkins pipeline template
+
+  - name: socrates-template-kotlin
+    source: github
+    repo: despegar/socrates-template-kotlin
+    branch: main
+    added: 2024-01-15
+    description: Scaffolding for Kotlin projects (Java 21)
+
+  - name: sem-template-render
+    source: github
+    repo: despegar/sem-template-render
+    branch: main
+    added: 2024-01-15
+    description: Template merging and processing for rendering
+
+  - name: changes-frontend-template
+    source: github
+    repo: despegar/changes-frontend-template
+    branch: main
+    added: 2024-01-15
+    description: Frontend template (easy to fork)
+
+  - name: sofia-integration-template
+    source: github
+    repo: despegar/sofia-integration-template
+    branch: main
+    added: 2024-01-15
+    description: Java template integrated with SOFIA
+
+  - name: front-vibe-template
+    source: github
+    repo: despegar/front-vibe-template
+    branch: main
+    added: 2024-01-15
+    description: Frontend vibe template
+
+  - name: template-jav-frontend
+    source: github
+    repo: despegar/template-jav-frontend
+    branch: main
+    added: 2024-01-15
+    description: JAV Workshop frontend template
+
+  - name: fs-spark-template
+    source: github
+    repo: despegar/fs-spark-template
+    branch: main
+    added: 2024-01-15
+    description: Spark template application
+
+  - name: nebula-database-scripts-template
+    source: github
+    repo: despegar/nebula-database-scripts-template
+    branch: main
+    added: 2024-01-15
+    description: Nebula database scripts template
+
+  - name: dbt-template-prj
+    source: github
+    repo: despegar/dbt_template_prj
+    branch: main
+    added: 2024-01-15
+    description: DBT init project template
+
+  - name: platform-template-scala-fun
+    source: github
+    repo: despegar/platform-template_scala_fun
+    branch: main
+    added: 2024-01-15
+    description: Base template for CastIO projects (Scala)

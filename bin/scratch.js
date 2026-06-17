@@ -51,6 +51,12 @@ function loadRegistry() {
   if (fs.existsSync(REGISTRY_FILE)) {
     return yaml.load(fs.readFileSync(REGISTRY_FILE, 'utf8'));
   }
+  // No user registry yet — bootstrap with default templates shipped with the CLI
+  const defaultRegistry = getDefaultRegistry();
+  if (defaultRegistry) {
+    saveRegistry(defaultRegistry);
+    return defaultRegistry;
+  }
   return { templates: [] };
 }
 
@@ -58,6 +64,19 @@ function loadRegistry() {
 function saveRegistry(registry) {
   ensureConfigDir();
   fs.writeFileSync(REGISTRY_FILE, yaml.dump(registry));
+}
+
+// Get default registry shipped with the CLI
+function getDefaultRegistry() {
+  const defaultPath = path.join(__dirname, '..', 'default-registry.yaml');
+  if (fs.existsSync(defaultPath)) {
+    try {
+      return yaml.load(fs.readFileSync(defaultPath, 'utf8'));
+    } catch (err) {
+      // ignore parse errors
+    }
+  }
+  return null;
 }
 
 // Default config
