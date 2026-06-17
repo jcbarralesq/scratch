@@ -30,6 +30,7 @@
   "files": [
     "bin/",
     "templates/",
+    "default-registry.yaml",
     "README.md"
   ],
   "engines": {
