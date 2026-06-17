@@ -162,66 +162,63 @@ async function cloneRepo(repo, dest, options = {}) {
 async function downloadRepo(repo, dest, options = {}) {
   const { branch = 'main', subpath = '' } = options;
   
-  let url;
-  if (repo.includes('/')) {
-    url = `https://github.com/${repo}/archive/refs/heads/${branch}.zip`;
-  } else {
-    url = repo;
+  // Use git clone — much more reliable than downloading zips from GitHub
+  // Handles private repos (with credentials), redirects, subpaths via sparse checkout
+  const { exec } = require('child_process');
+  
+  // Parse repo format
+  let repoUrl = repo;
+  if (!repo.startsWith('http') && !repo.startsWith('git@') && repo.includes('/')) {
+    repoUrl = `https://github.com/${repo}.git`;
   }
   
-  const https = require('https');
-  const http = require('http');
-  const { pipeline } = require('stream');
-  const { promisify } = require('util');
-  const pump = promisify(pipeline);
+  const tempDir = path.join(CONFIG_DIR, 'temp-clone-' + Date.now());
   
-  const tempZip = path.join(CONFIG_DIR, 'temp-download.zip');
-  
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
-    const file = fs.createWriteStream(tempZip);
+  try {
+    // Clone the repo
+    await new Promise((resolve, reject) => {
+      const args = [
+        'clone',
+        '--depth', '1',
+        '--branch', branch,
+        repoUrl,
+        tempDir
+      ];
+      const proc = exec(`git ${args.map(a => `"${a}"`).join(' ')}`, { 
+        cwd: path.dirname(tempDir),
+        maxBuffer: 1024 * 1024 * 100
+      });
+      let stderr = '';
+      proc.stderr.on('data', (data) => { stderr += data; });
+      proc.on('close', (code) => {
+        if (code === 0) resolve();
+        else reject(new Error(`git clone failed (exit ${code}): ${stderr.trim() || 'unknown error'}`));
+      });
+      proc.on('error', reject);
+    });
     
-    protocol.get(url, (response) => {
-      if (response.statusCode === 302 || response.statusCode === 301) {
-        file.close();
-        const redirectUrl = response.headers.location;
-        https.get(redirectUrl, (res) => {
-          pump(res, file).then(resolve).catch(reject);
-        }).on('error', reject);
-      } else {
-        pump(response, file).then(resolve).catch(reject);
-      }
-    }).on('error', reject);
-  }).then(async () => {
-    // Extract zip
-    const admzip = require('adm-zip');
-    const zip = new admzip(tempZip);
-    const extractDir = path.join(CONFIG_DIR, 'temp-extract');
+    // Determine source path within the cloned repo
+    const sourcePath = subpath 
+      ? path.join(tempDir, subpath)
+      : tempDir;
     
-    if (fs.existsSync(extractDir)) {
-      fs.rmSync(extractDir, { recursive: true });
-    }
-    fs.mkdirSync(extractDir, { recursive: true });
-    
-    zip.extractAllTo(extractDir);
-    
-    // Move contents to dest
-    const entries = fs.readdirSync(extractDir);
-    const firstEntry = entries[0];
-    if (firstEntry) {
-      const sourcePath = subpath 
-        ? path.join(extractDir, firstEntry, subpath)
-        : path.join(extractDir, firstEntry);
-      
-      if (fs.existsSync(sourcePath)) {
-        copyDir(sourcePath, dest);
-      }
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error(`Path not found in repo: ${subpath || '(root)'}`);
     }
     
-    // Cleanup
-    fs.rmSync(tempZip, { force: true });
-    fs.rmSync(extractDir, { recursive: true });
-  });
+    // Copy to dest
+    if (fs.existsSync(dest)) {
+      fs.rmSync(dest, { recursive: true, force: true });
+    }
+    fs.mkdirSync(dest, { recursive: true });
+    copyDir(sourcePath, dest);
+    
+  } finally {
+    // Cleanup temp clone
+    if (fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  }
 }
 
 // Copy directory recursively

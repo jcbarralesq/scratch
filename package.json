@@ -21,7 +21,6 @@
   "author": "JC Barrales",
   "license": "MIT",
   "dependencies": {
-    "adm-zip": "^0.5.10",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
     "inquirer": "^8.2.5",
