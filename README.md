@@ -14,8 +14,7 @@ A template-driven project generator. Create new projects from GitHub templates a
 - [Installation](#-installation)
   - [Option 1: npx (no install)](#option-1-npx-no-install)
   - [Option 2: npm install -g](#option-2-npm-install--g)
-  - [Option 3: Manual clone](#option-3-manual-clone)
-  - [Option 4: Local install (recommended for development)](#option-4-local-install-recommended-for-development)
+  - [Option 3: Local install (recommended for development)](#option-3-local-install-recommended-for-development)
 - [Commands](#-commands)
 - [Working with Templates](#-working-with-templates)
 - [Editor Integration](#-editor-integration)
@@ -86,52 +85,7 @@ To uninstall:
 npm uninstall -g from-scratch
 ```
 
-### Option 3: Manual clone
-
-Clone the repo and set up the wrapper yourself.
-
-**Linux / macOS / WSL:**
-
-```bash
-git clone https://github.com/jcbarralesq/scratch.git ~/.scratch-cli
-cd ~/.scratch-cli
-npm install
-
-# Add to PATH
-mkdir -p ~/.local/bin
-cat > ~/.local/bin/scratch <<'EOF'
-#!/usr/bin/env bash
-exec node "$HOME/.scratch-cli/bin/scratch.js" "$@"
-EOF
-chmod +x ~/.local/bin/scratch
-
-# Add to ~/.bashrc or ~/.zshrc if not already
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-**Windows (PowerShell):**
-
-```powershell
-git clone https://github.com/jcbarralesq/scratch.git $HOME\.scratch-cli
-cd $HOME\.scratch-cli
-npm install
-
-# Create wrapper
-$binDir = "$env:USERPROFILE\bin"
-New-Item -ItemType Directory -Path $binDir -Force
-@"
-@echo off
-node "%USERPROFILE%\.scratch-cli\bin\scratch.js" %*
-"@ | Out-File -FilePath "$binDir\scratch.cmd" -Encoding ascii
-
-# Add to PATH if not already
-$currentPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
-if ($currentPath -notlike "*$binDir*") {
-  [System.Environment]::SetEnvironmentVariable('Path', "$binDir;$currentPath", 'User')
-}
-```
-
-### Option 4: Local install (recommended for development)
+### Option 3: Local install (recommended for development)
 
 If you want to modify `scratch` itself:
 
