@@ -101,10 +101,7 @@ npm link  # makes 'scratch' available globally, linked to this checkout
 | Command | Description |
 |---------|-------------|
 | `scratch list` | List available templates in the registry |
-| `scratch add <name> --git <repo>` | Add a template from GitHub |
-| `scratch add <name> --source <path>` | Add a local template |
 | `scratch new <template> <name>` | Create a new project from a template |
-| `scratch remove <name>` | Remove a template from the registry |
 | `scratch update [name]` | Update templates from remote sources |
 | `scratch info <template>` | Show details about a template |
 | `scratch templates` | Show resolved paths for all templates |
@@ -115,21 +112,6 @@ npm link  # makes 'scratch' available globally, linked to this checkout
 Run `scratch --help` for the full reference.
 
 ## Working with Templates
-
-### Adding a template
-
-```bash
-# From a GitHub repo
-scratch add my-template --git user/repo-name
-scratch add my-template --git user/repo-name --branch develop
-scratch add my-template --git user/repo-name --path templates/subfolder
-
-# From a local directory
-scratch add local-template --source /path/to/local/template
-
-# Interactive mode (asks for details)
-scratch add my-template
-```
 
 ### Listing templates
 
