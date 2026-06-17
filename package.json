@@ -1,0 +1,46 @@
+{
+  "name": "from-scratch",
+  "version": "1.0.0",
+  "description": "From Scratch - Template-driven project generator CLI",
+  "main": "bin/scratch.js",
+  "bin": {
+    "scratch": "./bin/scratch.js"
+  },
+  "scripts": {
+    "start": "node bin/scratch.js",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "cli",
+    "template",
+    "project-generator",
+    "scaffolding",
+    "from-scratch",
+    "spec-kit-alternative"
+  ],
+  "author": "JC Barrales",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.5",
+    "js-yaml": "^4.1.0"
+  },
+  "files": [
+    "bin/",
+    "templates/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jcbarralesq/from-scratch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jcbarralesq/from-scratch/issues"
+  },
+  "homepage": "https://github.com/jcbarralesq/from-scratch#readme"
+}
