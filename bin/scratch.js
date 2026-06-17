@@ -1022,16 +1022,17 @@ async function processTemplate(dir, variables) {
       newName = newName.replace(new RegExp(`{{${key}}}`, 'g'), value);
     }
     
+    let currentPath = fullPath;
     if (newName !== entry.name) {
-      const newPath = path.join(dir, newName);
-      fs.renameSync(fullPath, newPath);
+      currentPath = path.join(dir, newName);
+      fs.renameSync(fullPath, currentPath);
     }
     
     if (entry.isDirectory()) {
-      await processTemplate(newPath !== undefined ? newPath : fullPath, variables);
+      await processTemplate(currentPath, variables);
     } else {
       // Replace variables in file content
-      let content = fs.readFileSync(newPath !== undefined ? newPath : fullPath, 'utf8');
+      let content = fs.readFileSync(currentPath, 'utf8');
       let modified = false;
       for (const [key, value] of Object.entries(variables)) {
         const newContent = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
@@ -1041,7 +1042,7 @@ async function processTemplate(dir, variables) {
         }
       }
       if (modified) {
-        fs.writeFileSync(newPath !== undefined ? newPath : fullPath, content);
+        fs.writeFileSync(currentPath, content);
       }
     }
   }
