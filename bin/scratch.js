@@ -438,7 +438,7 @@ async function main() {
           console.log(`  cd ${projectName}`);
         }
         console.log('  Open in your favorite editor');
-        console.log('  Use the /scratch:* slash commands');
+        console.log('  Use the /scratch-* slash commands');
       } catch (err) {
         printError(`Failed to create project: ${err.message}`);
         process.exit(1);
@@ -507,7 +507,7 @@ async function main() {
       console.log();
       clack.log.step('Open your AI agent and run:');
       console.log();
-      console.log(`  ${chalk.cyan.bold('/scratch:update')}`);
+      console.log(`  ${chalk.cyan.bold('/scratch-update')}`);
       console.log();
       console.log(chalk.gray('  The agent will read .scratch/UPDATE_PROMPT.md, check the skills'));
       console.log(chalk.gray('  catalog, and suggest relevant ones for this project.'));
@@ -708,7 +708,7 @@ async function main() {
           message: 'Which editor do you want to install scratch commands for?',
           options: [
             { value: 'all', label: 'All editors', hint: 'Claude Code, Cursor, and VSCode' },
-            { value: 'claude', label: 'Claude Code only', hint: '/scratch:list, /scratch:new, etc.' },
+            { value: 'claude', label: 'Claude Code only', hint: '/scratch-list, /scratch-new, etc.' },
             { value: 'cursor', label: 'Cursor only', hint: 'AI-first code editor' },
             { value: 'vscode', label: 'VS Code only', hint: 'Tasks via Command Palette' }
           ],
@@ -835,8 +835,8 @@ async function main() {
         console.log();
         clack.log.step('Restart your editor to load the commands:');
         console.log();
-        console.log(`  ${chalk.cyan('Claude Code:')}  /scratch:list`);
-        console.log(`  ${chalk.magenta('Cursor:')}       /scratch:list`);
+        console.log(`  ${chalk.cyan('Claude Code:')}  /scratch-list`);
+        console.log(`  ${chalk.magenta('Cursor:')}       /scratch-list`);
         console.log(`  ${chalk.blue('VS Code:')}       Cmd+Shift+P → "Scratch: ..."`);
         
         // Show available templates and next step
@@ -874,7 +874,7 @@ async function main() {
         s.stop();
         console.log();
         
-        console.log(`  ${chalk.cyan.bold('/scratch:new <template-name> --here')}`);
+        console.log(`  ${chalk.cyan.bold('/scratch-new <template-name> --here')}`);
         console.log();
         console.log(chalk.gray('  This will clone the template into the current directory.'));
         console.log(chalk.gray('  The agent will then read .scratch/INIT_PROMPT.md to continue.'));
