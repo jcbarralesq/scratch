@@ -119,7 +119,7 @@ npm link  # makes 'scratch' available globally, linked to this checkout
 | `scratch init [editor]` | Install slash commands in the current directory |
 | `scratch list` | List available templates |
 | `scratch new <template> --here` | Clone a template into the current directory |
-| `scratch update [name]` | Update a template's local cache from remote |
+| `scratch update` | Check for new skills relevant to this project |
 | `scratch info <template>` | Show details about a template |
 | `scratch templates` | Show resolved paths for all templates |
 | `scratch config <action>` | View and modify settings |
@@ -269,12 +269,15 @@ npx -y github:jcbarralesq/scratch init all < /dev/null
 npx -y github:jcbarralesq/scratch new mcp-template --here --no-install
 ```
 
-### Example 3: Update the template cache
+### Example 3: Check for new relevant skills
 
 ```bash
-scratch update mcp-template        # update a specific template
-scratch update --all               # update all remote templates
-scratch update mcp-template --force # force re-download
+# Inject the on_update prompt so the agent can scan the skills catalog
+scratch update
+
+# Then in your editor run:
+/scratch:update
+# The agent will suggest skills from agent-rules-and-skills that fit this project.
 ```
 
 ### Example 4: Add scratch to an existing project
@@ -344,14 +347,6 @@ Run `npm install` inside the cloned repo:
 ```bash
 cd ~/.scratch-cli  # or wherever you cloned it
 npm install
-```
-
-### `Template not found` after `scratch add`
-
-Run `scratch doctor` to check registry health:
-
-```bash
-scratch doctor
 ```
 
 ### `git clone failed` when using a GitHub template
