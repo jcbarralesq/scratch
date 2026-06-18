@@ -18,9 +18,24 @@ Sos un desarrollador senior preparando el ambiente para un proyecto nuevo recié
 
 **Repositorio de skills:** `despegar/agent-rules-and-skills` @ `v1.0.0`
 
-- Prompt 1 (análisis del proyecto): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/1-initialization-skills-agents-analyze-prompts.md`
-- Prompt 2 (sync de skills compartidos): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/2-initialization-skills-agents-prompts.md`
-- Prompt 3 (generación de skills customizados): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/3-initialization-skills-generation-prompts.md`
+⚠️ **El repo es privado** — los URLs públicos a `github.com/.../blob/...` o `raw.githubusercontent.com/...` retornan 404 incluso desde un navegador autenticado. Para descargar los prompts, usá la API de GitHub con `gh api` (o equivalente) que devuelve un `download_url` con un `?token=...` temporal que sí funciona.
+
+**Procedimiento para obtener cada prompt (repetir para los 3):**
+
+1. Llamá a la API de contenidos:
+   ```bash
+   gh api repos/despegar/agent-rules-and-skills/contents/prompts/<archivo> --jq '.download_url'
+   ```
+   Archivos:
+   - Prompt 1: `1-initialization-skills-agents-analyze-prompts.md`
+   - Prompt 2: `2-initialization-skills-agents-prompts.md`
+   - Prompt 3: `3-initialization-skills-generation-prompts.md`
+
+2. La API devuelve un JSON con campo `download_url` que incluye `?token=...`. Esa URL es válida durante ~5 minutos y sirve incluso para repos privados.
+
+3. Descargá el contenido de esa URL con `curl`/`Invoke-WebRequest`/etc. NO uses la URL pública de `raw.githubusercontent.com` — da 404.
+
+4. Si el `gh api` falla (sin auth), pedile al usuario que autentique con `gh auth login` antes de continuar.
 
 Los tres prompts se ejecutan en este flujo para que la cañería de skills custom quede armada desde el primer momento. Como el proyecto recién clonado tiene poca historia, el output del Prompt 3 puede ser básico — avisalo al usuario.
 
