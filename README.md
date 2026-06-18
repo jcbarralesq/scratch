@@ -36,7 +36,7 @@ A template-driven project generator. Create new projects from GitHub templates a
 
 ## Quick Start
 
-The recommended flow: install globally, then run `scratch init` in an empty directory, open it in your AI-powered editor, and use the `/scratch:new` command from inside the agent.
+The recommended flow: install globally, then run `scratch init` in an empty directory, open it in your AI-powered editor, and use the `/scratch-new` command from inside the agent.
 
 ```bash
 # 1. Install scratch globally
@@ -54,7 +54,7 @@ scratch init
 code .         # or: cursor .   or: claude
 
 # 5. In the agent, run:
-/scratch:new mcp-template --here
+/scratch-new mcp-template --here
 # This clones the template into the current directory
 # and injects .scratch/INIT_PROMPT.md for the agent to follow.
 
@@ -62,7 +62,7 @@ code .         # or: cursor .   or: claude
 # First run in the terminal:
 scratch update
 # Then in the agent:
-/scratch:update
+/scratch-update
 ```
 
 The `init` command shows a banner, asks which editor(s) to install for (Claude Code, Cursor, VS Code), and lists the available templates at the end. The `update` command injects a prompt that scans the agent-rules-and-skills catalog and suggests relevant skills for the project.
@@ -159,7 +159,7 @@ scratch init
 code .    # or: cursor .  or: claude
 
 # 3. From the agent, run:
-/scratch:new mcp-template --here
+/scratch-new mcp-template --here
 ```
 
 The slash command calls `scratch new <template> --here` which:
@@ -227,7 +227,7 @@ scratch init all --uninstall
 After `init`, in your editor run the agent and use:
 
 ```
-/scratch:new <template> --here
+/scratch-new <template> --here
 ```
 
 The `--here` flag is automatic for the `new` command — it clones the template into the current directory.
@@ -263,7 +263,7 @@ Updates `.vscode/tasks.json` with shell tasks labeled "Scratch: ...". Run them v
 mkdir mi-proyecto && cd mi-proyecto
 scratch init                    # install slash commands
 code .                          # or: cursor . / claude
-# In the agent: /scratch:new mcp-template --here
+# In the agent: /scratch-new mcp-template --here
 # → clones the template here, agent continues with .scratch/INIT_PROMPT.md
 ```
 
@@ -282,7 +282,7 @@ npx -y github:jcbarralesq/scratch new mcp-template --here --no-install
 scratch update
 
 # Then in your editor run:
-/scratch:update
+/scratch-update
 # The agent will suggest skills from agent-rules-and-skills that fit this project.
 ```
 
@@ -291,7 +291,7 @@ scratch update
 ```bash
 cd my-existing-project
 scratch init all
-# /scratch:doctor, /scratch:list, etc. now available
+# /scratch-doctor, /scratch-list, etc. now available
 ```
 
 ### Example 5: Customize the template registry

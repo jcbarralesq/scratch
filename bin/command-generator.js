@@ -25,31 +25,31 @@ const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe un prompt de scratc
 const COMMANDS = {
   new: {
     description: 'Create a new project from a template (in current dir)',
-    usage: '/scratch:new <template> [options]'
+    usage: '/scratch-new <template> [options]'
   },
   list: {
     description: 'List available templates',
-    usage: '/scratch:list [options]'
+    usage: '/scratch-list [options]'
   },
   update: {
     description: 'Check for new skills relevant to this project',
-    usage: '/scratch:update'
+    usage: '/scratch-update'
   },
   info: {
     description: 'Show detailed information about a template',
-    usage: '/scratch:info <template>'
+    usage: '/scratch-info <template>'
   },
   templates: {
     description: 'Show resolved template paths',
-    usage: '/scratch:templates'
+    usage: '/scratch-templates'
   },
   config: {
     description: 'View and modify settings',
-    usage: '/scratch:config <action>'
+    usage: '/scratch-config <action>'
   },
   doctor: {
     description: 'Check template registry health',
-    usage: '/scratch:doctor'
+    usage: '/scratch-doctor'
   }
 };
 
@@ -62,7 +62,7 @@ function generateClaudeCommand(name, cmd) {
   const preamble = promptFile
     ? `> ⚠️ **Antes de responder:** Si existe \`.scratch/${promptFile}\` en este proyecto, leélo primero y seguí esas instrucciones.\n\n`
     : PREAMBLE;
-  const body = `${preamble}# /scratch:${name}
+  const body = `${preamble}# /scratch-${name}
 
 ${cmd.description}
 
@@ -100,7 +100,7 @@ function generateCursorCommand(name, cmd) {
 description: ${cmd.description}
 ---
 
-${preamble}# /scratch:${name}
+${preamble}# /scratch-${name}
 
 ${cmd.description}
 
