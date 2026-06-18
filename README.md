@@ -54,7 +54,7 @@ scratch init
 code .         # or: cursor .   or: claude
 
 # 5. In the agent, run:
-/scratch:new mcp-template
+/scratch:new mcp-template --here
 # This clones the template into the current directory
 # and injects .scratch/INIT_PROMPT.md for the agent to follow.
 
@@ -81,7 +81,7 @@ Run `scratch` directly from GitHub without installing. The CLI will be downloade
 
 ```bash
 npx -y github:jcbarralesq/scratch list
-npx -y github:jcbarralesq/scratch new mcp-template mi-proyecto
+npx -y github:jcbarralesq/scratch new mcp-template --here
 npx -y github:jcbarralesq/scratch init all
 ```
 
@@ -94,7 +94,7 @@ npm install -g github:jcbarralesq/scratch
 
 # Now you can use scratch from anywhere
 scratch list
-scratch new mcp-template mi-proyecto
+scratch new mcp-template --here
 ```
 
 To upgrade later:
@@ -179,7 +179,7 @@ scratch new mcp-template --here
 # Skip dependency install
 scratch new mcp-template --here --no-install
 
-# Skip injecting the prompt
+# Skip installing slash commands in the new project
 scratch new mcp-template --here --no-commands
 ```
 
@@ -263,7 +263,7 @@ Updates `.vscode/tasks.json` with shell tasks labeled "Scratch: ...". Run them v
 mkdir mi-proyecto && cd mi-proyecto
 scratch init                    # install slash commands
 code .                          # or: cursor . / claude
-# In the agent: /scratch:new mcp-template
+# In the agent: /scratch:new mcp-template --here
 # → clones the template here, agent continues with .scratch/INIT_PROMPT.md
 ```
 
@@ -351,7 +351,7 @@ Then open a new terminal.
 Run `npm install` inside the cloned repo:
 
 ```bash
-cd ~/.scratch-cli  # or wherever you cloned it
+cd ~/.mavis/skills/from-scratch  # or wherever you cloned it
 npm install
 ```
 
