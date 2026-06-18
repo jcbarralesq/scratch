@@ -36,21 +36,24 @@ A template-driven project generator. Create new projects from GitHub templates a
 
 ## Quick Start
 
-The recommended flow: install slash commands in an empty directory, open it in your AI-powered editor, then use the `/scratch:new` command from inside the agent.
+The recommended flow: install globally, then run `scratch init` in an empty directory, open it in your AI-powered editor, and use the `/scratch:new` command from inside the agent.
 
 ```bash
-# 1. Create an empty directory for your new project
+# 1. Install scratch globally
+npm install -g github:jcbarralesq/scratch
+
+# 2. Create an empty directory for your new project
 mkdir my-new-project
 cd my-new-project
 
-# 2. Install scratch slash commands in this directory
+# 3. Install scratch slash commands in this directory
 scratch init
-# (or via npx: npx -y github:jcbarralesq/scratch init)
+# (or via npx if you prefer not to install: npx -y github:jcbarralesq/scratch init)
 
-# 3. Open the directory in your AI-powered editor
+# 4. Open the directory in your AI-powered editor
 code .         # or: cursor .   or: claude
 
-# 4. In the agent, run:
+# 5. In the agent, run:
 /scratch:new mcp-template
 # This clones the template into the current directory
 # and injects .scratch/INIT_PROMPT.md for the agent to follow.
