@@ -859,6 +859,32 @@ async function main() {
         console.log(`  ${chalk.cyan('Claude Code:')}  /scratch:list`);
         console.log(`  ${chalk.magenta('Cursor:')}       /scratch:list`);
         console.log(`  ${chalk.blue('VS Code:')}       Cmd+Shift+P → "Scratch: ..."`);
+        
+        // Show available templates and next step
+        console.log();
+        clack.log.step('Available templates:');
+        console.log();
+        const registry = loadRegistry();
+        if (registry.templates && registry.templates.length > 0) {
+          for (const t of registry.templates) {
+            const icon = t.source === 'github' ? '🌐' : '📁';
+            const source = t.repo || t.path || 'local';
+            console.log(`  ${icon} ${chalk.bold(t.name)} ${chalk.gray(`(${source})`)}`);
+            if (t.description) {
+              console.log(`     ${chalk.dim(t.description)}`);
+            }
+          }
+        } else {
+          console.log(chalk.yellow('  No templates registered yet.'));
+        }
+        
+        console.log();
+        clack.log.step('Open your AI agent and run:');
+        console.log();
+        console.log(`  ${chalk.cyan.bold('/scratch:new <template-name> --here')}`);
+        console.log();
+        console.log(chalk.gray('  This will clone the template into the current directory.'));
+        console.log(chalk.gray('  The agent will then read .scratch/INIT_PROMPT.md to continue.'));
       }
     });
   
