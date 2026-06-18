@@ -36,14 +36,27 @@ A template-driven project generator. Create new projects from GitHub templates a
 
 ## Quick Start
 
-```bash
-# Run without installing anything
-npx -y github:jcbarralesq/scratch new mcp-template mi-proyecto
+The recommended flow: install slash commands in an empty directory, open it in your AI-powered editor, then use the `/scratch:new` command from inside the agent.
 
-# Or install globally
-npm install -g github:jcbarralesq/scratch
-scratch new mcp-template mi-proyecto
+```bash
+# 1. Create an empty directory for your new project
+mkdir my-new-project
+cd my-new-project
+
+# 2. Install scratch slash commands in this directory
+scratch init
+# (or via npx: npx -y github:jcbarralesq/scratch init)
+
+# 3. Open the directory in your AI-powered editor
+code .         # or: cursor .   or: claude
+
+# 4. In the agent, run:
+/scratch:new mcp-template
+# This clones the template into the current directory
+# and injects .scratch/INIT_PROMPT.md for the agent to follow.
 ```
+
+The `init` command shows a banner, asks which editor(s) to install for (Claude Code, Cursor, VS Code), and lists the available templates at the end.
 
 ## Installation
 
@@ -100,50 +113,66 @@ npm link  # makes 'scratch' available globally, linked to this checkout
 
 | Command | Description |
 |---------|-------------|
-| `scratch list` | List available templates in the registry |
-| `scratch new <template> <name>` | Create a new project from a template |
-| `scratch update [name]` | Update templates from remote sources |
+| `scratch init [editor]` | Install slash commands in the current directory |
+| `scratch list` | List available templates |
+| `scratch new <template> --here` | Clone a template into the current directory |
+| `scratch update [name]` | Update a template's local cache from remote |
 | `scratch info <template>` | Show details about a template |
 | `scratch templates` | Show resolved paths for all templates |
 | `scratch config <action>` | View and modify settings |
 | `scratch doctor` | Check registry health |
-| `scratch init [editor]` | Install slash commands for an editor |
 
 Run `scratch --help` for the full reference.
+
+> The template registry is managed by editing `registry/default.yaml` directly and committing/pushing. There are no `add`/`remove` CLI commands — templates are read-only from the skill bundle.
 
 ## Working with Templates
 
 ### Listing templates
 
 ```bash
-scratch list                # all
-scratch list --local        # local only
-scratch list --remote       # GitHub only
+scratch list                # human-readable
 scratch list --json         # JSON output for scripts
 ```
 
-### Creating a project
+Templates are defined in `registry/default.yaml` and bundled with the CLI. To add or remove templates, edit that file directly and commit/push.
 
-```bash
-# Interactive (asks for template, name, path, editor)
-scratch new
+### Creating a project (from your AI agent)
 
-# Explicit
-scratch new mcp-template mi-proyecto
+The recommended flow runs through the AI agent:
 
-# With options
-scratch new react-app my-app --path ./workspace --force
-scratch new api-service my-api --no-install
+```
+# 1. Install slash commands in your empty directory
+cd my-new-project
+scratch init
+
+# 2. Open in your editor
+code .    # or: cursor .  or: claude
+
+# 3. From the agent, run:
+/scratch:new mcp-template --here
 ```
 
-The `new` command will:
+The slash command calls `scratch new <template> --here` which:
 
-1. Download the template (if remote)
-2. Create the project directory
-3. Replace template variables (`{{project_name}}`, etc.)
-4. **Ask which editor to integrate** (Claude/Cursor/VSCode/all)
-5. Install slash commands in the project
-6. Run `npm install` (if `package.json` exists)
+1. Clones the template into the current directory (no subfolder)
+2. Processes template variables (`{{project_name}}`, etc.)
+3. Injects `.scratch/INIT_PROMPT.md` for the agent to follow
+
+### Creating a project (from CLI directly)
+
+You can also run `new` from the terminal:
+
+```bash
+# Clone into the current directory
+scratch new mcp-template --here
+
+# Skip dependency install
+scratch new mcp-template --here --no-install
+
+# Skip injecting the prompt
+scratch new mcp-template --here --no-commands
+```
 
 ### Template variables
 
@@ -151,13 +180,15 @@ Inside your template files, use `{{variable}}` placeholders. They will be replac
 
 | Variable | Example | Description |
 |----------|---------|-------------|
-| `{{project_name}}` | `my-project` | Kebab-case project name |
+| `{{project_name}}` | `my-project` | Kebab-case project name (uses folder name when `--here`) |
 | `{{project_name_camel}}` | `myProject` | camelCase version |
 | `{{project_name_pascal}}` | `MyProject` | PascalCase version |
 
 ## Editor Integration
 
-`scratch init [editor]` installs slash commands (or VS Code tasks) in your project. Editor is one of:
+`scratch init [editor]` installs slash commands in your project. It shows a banner, asks which editor(s) to install for interactively, then displays the available templates and the next command to run in your agent.
+
+Editor is one of:
 
 - `claude` — Claude Code
 - `cursor` — Cursor
@@ -165,12 +196,14 @@ Inside your template files, use `{{variable}}` placeholders. They will be replac
 - `all` — all of the above (default)
 
 ```bash
-# In your project directory
-scratch init              # all editors
-scratch init all          # same
-scratch init claude       # only Claude Code
-scratch init cursor       # only Cursor
-scratch init vscode       # only VS Code
+# Interactive (default)
+scratch init
+
+# Explicit
+scratch init all
+scratch init claude
+scratch init cursor
+scratch init vscode
 
 # Global install (for all projects)
 scratch init all --global
@@ -182,6 +215,14 @@ scratch init all --dry-run
 scratch init all --uninstall
 ```
 
+After `init`, in your editor run the agent and use:
+
+```
+/scratch:new <template> --here
+```
+
+The `--here` flag is automatic for the `new` command — it clones the template into the current directory.
+
 ### Claude Code
 
 Installs slash commands in `.claude/commands/`:
@@ -190,8 +231,6 @@ Installs slash commands in `.claude/commands/`:
 .claude/commands/
 ├── scratch-new.md
 ├── scratch-list.md
-├── scratch-add.md
-├── scratch-remove.md
 ├── scratch-update.md
 ├── scratch-info.md
 ├── scratch-templates.md
@@ -199,115 +238,66 @@ Installs slash commands in `.claude/commands/`:
 └── scratch-doctor.md
 ```
 
-After installation, in Claude Code:
-
-```
-/scratch:list
-/scratch:new mcp-template mi-proyecto
-/scratch:doctor
-```
-
 ### Cursor
 
 Same structure as Claude Code, but installed in `.cursor/commands/`.
 
-```
-.cursor/commands/
-├── scratch-new.md
-├── scratch-list.md
-├── ...
-```
-
-In Cursor:
-
-```
-/scratch:list
-/scratch:new mcp-template mi-proyecto
-```
-
 ### VS Code
 
-Updates `.vscode/tasks.json` with shell tasks:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Scratch: Create a new project from a template",
-      "type": "shell",
-      "command": "node",
-      "args": ["path/to/scratch.js", "new"],
-      ...
-    },
-    ...
-  ]
-}
-```
-
-In VS Code:
-
-1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
-2. Type "Tasks: Run Task"
-3. Select one of the "Scratch: ..." tasks
+Updates `.vscode/tasks.json` with shell tasks labeled "Scratch: ...". Run them via `Ctrl+Shift+P` → "Tasks: Run Task".
 
 ## Usage Examples
 
-### Example 1: Start a new MCP server
+### Example 1: Full flow with the AI agent
 
 ```bash
-scratch new mcp-template mi-primer-mcp
-cd mi-primer-mcp
-# Open in your editor
-code .
-# Or: cursor .
-# Or: claude
+mkdir mi-proyecto && cd mi-proyecto
+scratch init                    # install slash commands
+code .                          # or: cursor . / claude
+# In the agent: /scratch:new mcp-template
+# → clones the template here, agent continues with .scratch/INIT_PROMPT.md
 ```
 
-### Example 2: Add a template from your team
+### Example 2: Use from CI / scripts (non-interactive)
 
 ```bash
-scratch add team-frontend --git yourorg/frontend-template
-scratch new team-frontend my-frontend
+# Use npx from GitHub — no install needed
+npx -y github:jcbarralesq/scratch init all < /dev/null
+npx -y github:jcbarralesq/scratch new mcp-template --here --no-install
 ```
 
-### Example 3: Add templates from the despegar org
+### Example 3: Update the template cache
 
 ```bash
-# 25+ templates from github.com/despegar
-scratch add java-template --git despegar/java-template
-scratch add kotlin-template --git despegar/kotlin-template
-scratch add nestjs-template --git despegar/nestjs-template
-scratch new java-template mi-servicio
+scratch update mcp-template        # update a specific template
+scratch update --all               # update all remote templates
+scratch update mcp-template --force # force re-download
 ```
 
-### Example 4: Use from CI / scripts
-
-```bash
-# Non-interactive workflow
-scratch new mcp-template my-app --no-install --no-commands
-```
-
-### Example 5: Update a template
-
-```bash
-# Update a specific template
-scratch update mcp-template
-
-# Update all remote templates
-scratch update --all
-
-# Force re-download
-scratch update mcp-template --force
-```
-
-### Example 6: Add scratch to an existing project
+### Example 4: Add scratch to an existing project
 
 ```bash
 cd my-existing-project
-scratch init all  # install slash commands
+scratch init all
 # /scratch:doctor, /scratch:list, etc. now available
 ```
+
+### Example 5: Customize the template registry
+
+Edit `registry/default.yaml` directly:
+
+```bash
+# In the skill directory
+cd ~/.mavis/skills/from-scratch
+vim registry/default.yaml
+
+# Add or remove templates, then commit and push
+git add registry/default.yaml
+git commit -m "Add new template"
+git push
+```
+
+Other users will see the changes on their next `npx` run.
 
 ## Cross-Platform
 
