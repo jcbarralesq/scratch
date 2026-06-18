@@ -18,9 +18,9 @@ Sos un desarrollador senior preparando el ambiente para un proyecto nuevo recié
 
 **Repositorio de skills:** `despegar/agent-rules-and-skills` @ `v1.0.0`
 
-- Prompt 1 (análisis del proyecto): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/01-project-analysis.md`
-- Prompt 2 (sync de skills compartidos): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/02-skills-sync.md`
-- Prompt 3 (generación de skills customizados): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/03-custom-skills.md`
+- Prompt 1 (análisis del proyecto): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/1-initialization-skills-agents-analyze-prompts.md`
+- Prompt 2 (sync de skills compartidos): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/2-initialization-skills-agents-prompts.md`
+- Prompt 3 (generación de skills customizados): `https://github.com/despegar/agent-rules-and-skills/blob/311a703077eb95b1dd5cd917cd09a59c99b15a82/prompts/3-initialization-skills-generation-prompts.md`
 
 Los tres prompts se ejecutan en este flujo para que la cañería de skills custom quede armada desde el primer momento. Como el proyecto recién clonado tiene poca historia, el output del Prompt 3 puede ser básico — avisalo al usuario.
 
