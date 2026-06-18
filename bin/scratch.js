@@ -45,7 +45,7 @@ function saveConfig(config) {
   fs.writeFileSync(CONFIG_FILE, yaml.dump(config));
 }
 
-// Load registry — always reads from the bundled default-registry.yaml
+// Load registry — always reads from the bundled registry/default.yaml
 // (Option 1: no local cache, every run is fresh from the repo)
 function loadRegistry() {
   const defaultRegistry = getDefaultRegistry();
@@ -55,16 +55,16 @@ function loadRegistry() {
   return { templates: [] };
 }
 
-// Save registry — writes to the bundled default-registry.yaml
+// Save registry — writes to the bundled registry/default.yaml
 // (so changes propagate when the user commits and pushes)
 function saveRegistry(registry) {
-  const defaultPath = path.join(__dirname, '..', 'default-registry.yaml');
+  const defaultPath = path.join(__dirname, '..', 'registry', 'default.yaml');
   fs.writeFileSync(defaultPath, yaml.dump(registry));
 }
 
 // Get default registry shipped with the CLI
 function getDefaultRegistry() {
-  const defaultPath = path.join(__dirname, '..', 'default-registry.yaml');
+  const defaultPath = path.join(__dirname, '..', 'registry', 'default.yaml');
   if (fs.existsSync(defaultPath)) {
     try {
       return yaml.load(fs.readFileSync(defaultPath, 'utf8'));
@@ -943,9 +943,9 @@ async function processTemplate(dir, variables) {
 
 // Inject on_new prompt into the new project
 function injectOnNewPrompt(targetPath) {
-  // Priority: user-defined ~/.scratch/on_new.md > bundled default-on-new.md
+  // Priority: user-defined ~/.scratch/on_new.md > bundled prompts/default-on-new.md
   const userPrompt = path.join(CONFIG_DIR, 'on_new.md');
-  const defaultPrompt = path.join(__dirname, '..', 'default-on-new.md');
+  const defaultPrompt = path.join(__dirname, '..', 'prompts', 'default-on-new.md');
   
   let sourcePath = null;
   if (fs.existsSync(userPrompt)) {

@@ -28,9 +28,8 @@
   },
   "files": [
     "bin/",
-    "templates/",
-    "default-registry.yaml",
-    "default-on-new.md",
+    "prompts/",
+    "registry/",
     "README.md"
   ],
   "engines": {
