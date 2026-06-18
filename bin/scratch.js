@@ -259,8 +259,9 @@ async function main() {
   // === scratch new (was: gen init) ===
   program
     .command('new [template] [project-name]')
-    .description('Create a new project from a template')
+    .description('Create a new project from a template (in current dir with --here)')
     .option('-p, --path <path>', 'Target directory')
+    .option('--here', 'Create in current directory (instead of a subfolder)')
     .option('-f, --force', 'Overwrite existing files')
     .option('--no-install', 'Skip dependency installation')
     .option('-t, --template <source>', 'Use a specific template source')
@@ -283,39 +284,45 @@ async function main() {
           process.exit(2);
         }
         
-        const answers = await inquirer.prompt([
+        const questions = [
           {
             type: 'list',
             name: 'template',
             message: 'Select a template:',
             choices: templates
-          },
-          {
+          }
+        ];
+        
+        if (!options.here) {
+          questions.push({
             type: 'input',
             name: 'projectName',
             message: 'Project name:',
             validate: (input) => /^[a-z][a-z0-9-]*$/.test(input) || 'Use kebab-case (e.g., my-project)'
-          },
-          {
+          });
+          questions.push({
             type: 'input',
             name: 'path',
             message: 'Target directory:',
             default: './'
-          },
-          {
-            type: 'list',
-            name: 'integration',
-            message: 'Install slash commands for:',
-            choices: [
-              { name: 'All editors (Claude Code, Cursor, VSCode)', value: 'all' },
-              { name: 'Claude Code only', value: 'claude' },
-              { name: 'Cursor only', value: 'cursor' },
-              { name: 'VSCode only', value: 'vscode' },
-              { name: 'Skip (no editor integration)', value: 'none' }
-            ],
-            default: 'all'
-          }
-        ]);
+          });
+        }
+        
+        questions.push({
+          type: 'list',
+          name: 'integration',
+          message: 'Install slash commands for:',
+          choices: [
+            { name: 'All editors (Claude Code, Cursor, VSCode)', value: 'all' },
+            { name: 'Claude Code only', value: 'claude' },
+            { name: 'Cursor only', value: 'cursor' },
+            { name: 'VSCode only', value: 'vscode' },
+            { name: 'Skip (no editor integration)', value: 'none' }
+          ],
+          default: 'all'
+        });
+        
+        const answers = await inquirer.prompt(questions);
         
         template = answers.template;
         projectName = answers.projectName;
@@ -357,23 +364,37 @@ async function main() {
       }
       
       // Create target directory
-      const targetPath = path.join(options.path || '.', projectName);
-      if (fs.existsSync(targetPath) && !options.force) {
-        printError(`Directory "${targetPath}" already exists. Use --force to overwrite.`);
-        process.exit(1);
+      let targetPath;
+      if (options.here) {
+        // Create in current directory
+        targetPath = path.resolve(options.path || '.');
+        // Check current dir is empty (or only has hidden files)
+        const entries = fs.readdirSync(targetPath).filter(name => !name.startsWith('.'));
+        if (entries.length > 0 && !options.force) {
+          printError(`Current directory is not empty: ${targetPath}`);
+          printError('Use --force to merge into existing files, or create a new folder.');
+          process.exit(1);
+        }
+      } else {
+        targetPath = path.join(options.path || '.', projectName);
+        if (fs.existsSync(targetPath) && !options.force) {
+          printError(`Directory "${targetPath}" already exists. Use --force to overwrite.`);
+          process.exit(1);
+        }
       }
       
-      printInfo(`Creating project "${projectName}" from template "${template}"...`);
+      printInfo(`Creating project from template "${template}" in ${targetPath}...`);
       
       // Copy template
       try {
         copyDir(sourcePath, targetPath);
         
-        // Process template variables
+        // Process template variables (use current folder name if --here)
+        const nameForVars = projectName || path.basename(targetPath);
         await processTemplate(targetPath, {
-          project_name: projectName,
-          project_name_camel: projectName.replace(/-([a-z])/g, (_, c) => c.toUpperCase()),
-          project_name_pascal: projectName.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('')
+          project_name: nameForVars,
+          project_name_camel: nameForVars.replace(/-([a-z])/g, (_, c) => c.toUpperCase()),
+          project_name_pascal: nameForVars.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('')
         });
         
         printSuccess(`Project created at: ${targetPath}`);
@@ -417,8 +438,9 @@ async function main() {
         
         console.log();
         printSuccess('All done! Next steps:');
-        console.log(`  cd ${projectName}`);
-        console.log('  Run: scratch init (to add slash commands)');
+        if (!options.here && projectName) {
+          console.log(`  cd ${projectName}`);
+        }
         console.log('  Open in your favorite editor');
         console.log('  Use the /scratch:* slash commands');
       } catch (err) {

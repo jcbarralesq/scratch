@@ -6,7 +6,8 @@ Sos un desarrollador senior preparando el ambiente para un proyecto nuevo recié
 
 ## Restricciones globales
 
-- El proyecto ya fue clonado y nombrado por el usuario (`scratch new <template> <name>`). No vuelvas a clonar.
+- El proyecto ya fue clonado en el directorio actual con `scratch new <template> --here`. No vuelvas a clonar.
+- El proyecto ya está nombrado. No crees subcarpetas con el nombre del template.
 - Verificá que el directorio destino sea el correcto (el actual). Si hay archivos inesperados, no destruyas nada.
 - Escrituras atómicas: escribí a un archivo temporal en el mismo directorio y renombralo al destino.
 - Merge en vez de overwrite para `AGENTS.md`, `CLAUDE.md` y `.claude/settings.json` usando marcadores `<!-- AUTO-GENERATED: ...-start -->` / `<!-- AUTO-GENERATED: ...-end -->`. Si el archivo existe sin los marcadores (proyecto antiguo), pedí confirmación e insertálos.
