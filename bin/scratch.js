@@ -714,24 +714,67 @@ async function main() {
     .option('--uninstall', 'Remove installed commands')
     .option('--dry-run', 'Show what would be done without making changes')
     .action(async (editor, options) => {
-      const editors = ['claude', 'cursor', 'vscode', 'all'];
-      if (!editor || editor === 'all') {
-        editor = 'all';
-      } else if (!editors.includes(editor)) {
-        printError(`Unknown editor: ${editor}. Valid: ${editors.join(', ')}`);
+      const { clack, showBanner, StepTracker } = require('./ui');
+      const s = clack.spinner();
+      
+      // Show banner
+      showBanner();
+      
+      const validEditors = ['claude', 'cursor', 'vscode', 'all'];
+      let selectedEditor = editor || 'all';
+      
+      // Ask for editor if not provided or invalid
+      if (!editor) {
+        const answer = await clack.select({
+          message: 'Which editor do you want to install scratch commands for?',
+          options: [
+            { value: 'all', label: 'All editors', hint: 'Claude Code, Cursor, and VSCode' },
+            { value: 'claude', label: 'Claude Code only', hint: '/scratch:list, /scratch:new, etc.' },
+            { value: 'cursor', label: 'Cursor only', hint: 'AI-first code editor' },
+            { value: 'vscode', label: 'VS Code only', hint: 'Tasks via Command Palette' }
+          ],
+          initialValue: 'all'
+        });
+        if (clack.isCancel(answer)) {
+          clack.cancel('Setup cancelled');
+          process.exit(0);
+        }
+        selectedEditor = answer;
+      } else if (!validEditors.includes(editor)) {
+        clack.log.error(`Unknown editor: ${editor}. Valid: ${validEditors.join(', ')}`);
         process.exit(1);
+      }
+      
+      // Ask for scope if not specified via flag
+      let isProject = !options.global;
+      if (process.argv.includes('--global')) {
+        isProject = false;
+      }
+      if (!process.argv.includes('--global') && !options.global) {
+        const scopeAnswer = await clack.select({
+          message: 'Install scope:',
+          options: [
+            { value: 'project', label: 'This project only', hint: 'Commands installed in current dir' },
+            { value: 'global', label: 'Global', hint: 'Commands installed in home dir, work in all projects' }
+          ],
+          initialValue: 'project'
+        });
+        if (clack.isCancel(scopeAnswer)) {
+          clack.cancel('Setup cancelled');
+          process.exit(0);
+        }
+        isProject = scopeAnswer === 'project';
       }
       
       const home = process.env.HOME || process.env.USERPROFILE;
       const isWindows = process.platform === 'win32';
-      const isProject = !options.global;
       const cwd = process.cwd();
       
       // Determine paths
       const targetDirs = {
         claude: isProject 
           ? path.join(cwd, '.claude', 'commands')
-          : path.join(home, isWindows ? 'AppData' : '', '.claude', 'commands'),
+          : path.join(home, isWindows ? '' : '', '.claude', 'commands'),
         cursor: isProject
           ? path.join(cwd, '.cursor', 'commands')
           : path.join(home, '.cursor', 'commands'),
@@ -755,24 +798,38 @@ async function main() {
       }
       
       const scratchCliPath = path.join(__dirname, 'scratch.js');
-      
-      const targetEditors = editor === 'all' 
+      const targetEditors = selectedEditor === 'all' 
         ? ['claude', 'cursor', 'vscode'] 
-        : [editor];
+        : [selectedEditor];
       
-      printInfo(`Setting up slash commands for: ${targetEditors.join(', ')}`);
-      printInfo(`Scope: ${isProject ? 'project' : 'global'}`);
       console.log();
+      clack.log.info(`Installing for: ${targetEditors.map(e => {
+        if (e === 'claude') return chalk.cyan('Claude Code');
+        if (e === 'cursor') return chalk.magenta('Cursor');
+        if (e === 'vscode') return chalk.blue('VS Code');
+        return e;
+      }).join(', ')}`);
+      clack.log.info(`Scope: ${isProject ? chalk.green('project') : chalk.yellow('global')}`);
+      console.log();
+      
+      const tracker = new StepTracker('Setup progress');
+      targetEditors.forEach(ed => {
+        const label = ed === 'claude' ? 'Claude Code' : ed === 'cursor' ? 'Cursor' : 'VS Code';
+        tracker.add(ed, `Install ${label} commands`);
+      });
       
       for (const ed of targetEditors) {
         const targetDir = targetDirs[ed];
         
         if (options.dryRun) {
-          printInfo(`[DRY-RUN] Would ${options.uninstall ? 'uninstall' : 'install'} ${ed} commands in: ${targetDir}`);
+          clack.log.info(`[DRY-RUN] Would ${options.uninstall ? 'uninstall' : 'install'} ${ed} commands in: ${targetDir}`);
+          tracker.skip(ed, 'dry-run');
           continue;
         }
         
+        tracker.start(ed);
         try {
+          s.start(`Installing ${ed}...`);
           if (ed === 'claude') {
             installClaudeCommands(targetDir, scratchCliPath, options.uninstall);
           } else if (ed === 'cursor') {
@@ -780,21 +837,28 @@ async function main() {
           } else if (ed === 'vscode') {
             installVSCodeCommands(targetDir, scratchCliPath, options.uninstall);
           }
+          s.stop(`${ed} ✓`);
+          tracker.complete(ed, '9 commands');
         } catch (err) {
-          printError(`Failed to setup ${ed}: ${err.message}`);
+          s.stop(`${ed} ✗`, 1);
+          tracker.error(ed, err.message);
         }
       }
       
       console.log();
-      printSuccess(`Setup ${options.uninstall ? 'uninstall' : 'complete'}!`);
+      console.log(tracker.render());
+      console.log();
       
-      if (!options.uninstall) {
+      if (options.uninstall) {
+        clack.log.success('Commands removed');
+      } else {
+        clack.log.success('Setup complete!');
         console.log();
-        printInfo('Restart your editor to load the new commands.');
+        clack.log.step('Restart your editor to load the commands:');
         console.log();
-        console.log('  Claude Code: /scratch:list');
-        console.log('  Cursor:      /scratch:list');
-        console.log('  VSCode:      Cmd+Shift+P → "Scratch: ..."');
+        console.log(`  ${chalk.cyan('Claude Code:')}  /scratch:list`);
+        console.log(`  ${chalk.magenta('Cursor:')}       /scratch:list`);
+        console.log(`  ${chalk.blue('VS Code:')}       Cmd+Shift+P → "Scratch: ..."`);
       }
     });
   
