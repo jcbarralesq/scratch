@@ -10,8 +10,8 @@ const SCRATCH_CLI_PATH_PLACEHOLDER = '__SCRATCH_CLI_PATH__';
 // Commands that should pass --here by default (work in current directory)
 const HERE_COMMANDS = ['new'];
 
-// Preamble included in every command: tells the agent to read INIT_PROMPT.md first
-const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PROMPT.md\` en este proyecto, leélo primero y seguí esas instrucciones.
+// Preamble included in every command: tells the agent to read the relevant prompt first
+const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PROMPT.md\` o \`.scratch/UPDATE_PROMPT.md\` en este proyecto, leélo primero y seguí esas instrucciones.
 
 `;
 

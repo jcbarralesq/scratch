@@ -484,54 +484,33 @@ async function main() {
       }
     });
   
-  // === gen update ===
+  // === scratch update ===
+  // Injects the on-update prompt so the agent can check for new skills
+  // relevant to this project (reads CATALOG.md from agent-rules-and-skills repo)
   program
-    .command('update [template]')
-    .description('Update templates from remote sources')
-    .option('-a, --all', 'Update all templates')
-    .option('-f, --force', 'Force re-download')
-    .action(async (template, options) => {
-      const registry = loadRegistry();
+    .command('update')
+    .description('Check for new skills relevant to this project')
+    .option('--no-prompt', 'Skip injecting the prompt file')
+    .action(async (options) => {
+      const { clack, chalk } = require('./ui');
+      const targetPath = process.cwd();
       
-      const templatesToUpdate = options.all
-        ? registry.templates.filter(t => t.source === 'github')
-        : [registry.templates.find(t => t.name === template)].filter(Boolean);
+      printInfo('Preparing to check for new skills...');
       
-      if (templatesToUpdate.length === 0) {
-        if (options.all) {
-          printInfo('No remote templates to update');
-        } else {
-          printError(`Template "${template}" not found or not a remote template`);
-        }
-        return;
+      // Inject on_update prompt if available
+      if (options.prompt !== false) {
+        injectOnUpdatePrompt(targetPath);
       }
       
-      for (const t of templatesToUpdate) {
-        printInfo(`Updating "${t.name}"...`);
-        const destPath = path.join(TEMPLATES_DIR, t.name);
-        
-        if (fs.existsSync(destPath)) {
-          if (options.force) {
-            fs.rmSync(destPath, { recursive: true });
-          } else {
-            printWarning(`"${t.name}" already cached. Use --force to re-download.`);
-            continue;
-          }
-        }
-        
-        try {
-          await downloadRepo(t.repo, destPath, {
-            branch: t.branch,
-            subpath: t.path
-          });
-          t.lastUpdated = new Date().toISOString().split('T')[0];
-          printSuccess(`"${t.name}" updated`);
-        } catch (err) {
-          printError(`Failed to update "${t.name}": ${err.message}`);
-        }
-      }
-      
-      saveRegistry(registry);
+      console.log();
+      clack.log.success('Update ready!');
+      console.log();
+      clack.log.step('Open your AI agent and run:');
+      console.log();
+      console.log(`  ${chalk.cyan.bold('/scratch:update')}`);
+      console.log();
+      console.log(chalk.gray('  The agent will read .scratch/UPDATE_PROMPT.md, check the skills'));
+      console.log(chalk.gray('  catalog, and suggest relevant ones for this project.'));
     });
   
   // === gen info ===
@@ -1050,7 +1029,7 @@ function injectOnNewPrompt(targetPath) {
   // Priority: user-defined ~/.scratch/on_new.md > bundled prompts/default-on-new.md
   const userPrompt = path.join(CONFIG_DIR, 'on_new.md');
   const defaultPrompt = path.join(__dirname, '..', 'prompts', 'default-on-new.md');
-  
+
   let sourcePath = null;
   if (fs.existsSync(userPrompt)) {
     sourcePath = userPrompt;
@@ -1058,18 +1037,49 @@ function injectOnNewPrompt(targetPath) {
   } else if (fs.existsSync(defaultPrompt)) {
     sourcePath = defaultPrompt;
   }
-  
+
   if (!sourcePath) return; // no prompt to inject, silent skip
-  
+
   const destDir = path.join(targetPath, '.scratch');
   const destPath = path.join(destDir, 'INIT_PROMPT.md');
-  
+
   try {
     fs.mkdirSync(destDir, { recursive: true });
     fs.copyFileSync(sourcePath, destPath);
     printSuccess('Injected on_new prompt to .scratch/INIT_PROMPT.md');
   } catch (err) {
     printWarning(`Could not inject on_new prompt: ${err.message}`);
+  }
+}
+
+// Inject on_update prompt into the current directory
+function injectOnUpdatePrompt(targetPath) {
+  // Priority: user-defined ~/.scratch/on_update.md > bundled prompts/default-on-update.md
+  const userPrompt = path.join(CONFIG_DIR, 'on_update.md');
+  const defaultPrompt = path.join(__dirname, '..', 'prompts', 'default-on-update.md');
+
+  let sourcePath = null;
+  if (fs.existsSync(userPrompt)) {
+    sourcePath = userPrompt;
+    printInfo('Using custom on_update.md from ~/.scratch/');
+  } else if (fs.existsSync(defaultPrompt)) {
+    sourcePath = defaultPrompt;
+  }
+
+  if (!sourcePath) {
+    printWarning('No on_update prompt found');
+    return;
+  }
+
+  const destDir = path.join(targetPath, '.scratch');
+  const destPath = path.join(destDir, 'UPDATE_PROMPT.md');
+
+  try {
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(sourcePath, destPath);
+    printSuccess('Injected on_update prompt to .scratch/UPDATE_PROMPT.md');
+  } catch (err) {
+    printWarning(`Could not inject on_update prompt: ${err.message}`);
   }
 }
 
