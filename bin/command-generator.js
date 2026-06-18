@@ -10,8 +10,14 @@ const SCRATCH_CLI_PATH_PLACEHOLDER = '__SCRATCH_CLI_PATH__';
 // Commands that should pass --here by default (work in current directory)
 const HERE_COMMANDS = ['new'];
 
-// Preamble included in every command: tells the agent to read the relevant prompt first
-const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PROMPT.md\` o \`.scratch/UPDATE_PROMPT.md\` en este proyecto, leélo primero y seguí esas instrucciones.
+// Map of command → specific prompt file (instead of generic PREAMBLE)
+const PROMPT_FILE = {
+  new: 'INIT_PROMPT.md',
+  update: 'UPDATE_PROMPT.md'
+};
+
+// Generic preamble for commands without a specific prompt file
+const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe un prompt de scratch (\`.scratch/*_PROMPT.md\`) en este proyecto, leélo primero y seguí esas instrucciones.
 
 `;
 
@@ -24,14 +30,6 @@ const COMMANDS = {
   list: {
     description: 'List available templates',
     usage: '/scratch:list [options]'
-  },
-  add: {
-    description: 'Add a template to the registry',
-    usage: '/scratch:add <name> --git <repo>'
-  },
-  remove: {
-    description: 'Remove a template from the registry',
-    usage: '/scratch:remove <name>'
   },
   update: {
     description: 'Check for new skills relevant to this project',
@@ -60,7 +58,11 @@ const COMMANDS = {
  */
 function generateClaudeCommand(name, cmd) {
   const hereFlag = HERE_COMMANDS.includes(name) ? ' --here' : '';
-  const body = `${PREAMBLE}# /scratch:${name}
+  const promptFile = PROMPT_FILE[name];
+  const preamble = promptFile
+    ? `> ⚠️ **Antes de responder:** Si existe \`.scratch/${promptFile}\` en este proyecto, leélo primero y seguí esas instrucciones.\n\n`
+    : PREAMBLE;
+  const body = `${preamble}# /scratch:${name}
 
 ${cmd.description}
 
@@ -90,11 +92,15 @@ node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name}${hereFlag} $ARGUMENTS
  */
 function generateCursorCommand(name, cmd) {
   const hereFlag = HERE_COMMANDS.includes(name) ? ' --here' : '';
+  const promptFile = PROMPT_FILE[name];
+  const preamble = promptFile
+    ? `> ⚠️ **Antes de responder:** Si existe \`.scratch/${promptFile}\` en este proyecto, leélo primero y seguí esas instrucciones.\n\n`
+    : PREAMBLE;
   const body = `---
 description: ${cmd.description}
 ---
 
-${PREAMBLE}# /scratch:${name}
+${preamble}# /scratch:${name}
 
 ${cmd.description}
 
