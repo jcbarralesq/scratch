@@ -34,8 +34,8 @@ const COMMANDS = {
     usage: '/scratch:remove <name>'
   },
   update: {
-    description: 'Update templates from remote sources',
-    usage: '/scratch:update [template] [options]'
+    description: 'Check for new skills relevant to this project',
+    usage: '/scratch:update'
   },
   info: {
     description: 'Show detailed information about a template',
