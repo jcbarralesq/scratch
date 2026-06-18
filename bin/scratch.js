@@ -868,7 +868,7 @@ async function main() {
         // Spinner before listing templates
         s.start('Loading templates...');
         await new Promise(resolve => setTimeout(resolve, 1500));
-        s.stop('Templates loaded');
+        s.stop();
         console.log();
         
         const registry = loadRegistry();
@@ -892,7 +892,7 @@ async function main() {
         // Spinner before next steps
         s.start('Preparing next steps...');
         await new Promise(resolve => setTimeout(resolve, 1500));
-        s.stop('Ready');
+        s.stop();
         console.log();
         
         console.log(`  ${chalk.cyan.bold('/scratch:new <template-name> --here')}`);
