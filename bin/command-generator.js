@@ -7,6 +7,9 @@ const path = require('path');
 
 const SCRATCH_CLI_PATH_PLACEHOLDER = '__SCRATCH_CLI_PATH__';
 
+// Commands that should pass --here by default (work in current directory)
+const HERE_COMMANDS = ['new'];
+
 // Preamble included in every command: tells the agent to read INIT_PROMPT.md first
 const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PROMPT.md\` en este proyecto, leélo primero y seguí esas instrucciones.
 
@@ -15,8 +18,8 @@ const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PRO
 // Command definitions
 const COMMANDS = {
   new: {
-    description: 'Create a new project from a template',
-    usage: '/scratch:new [template] [project-name] [options]'
+    description: 'Create a new project from a template (in current dir)',
+    usage: '/scratch:new <template> [options]'
   },
   list: {
     description: 'List available templates',
@@ -56,6 +59,7 @@ const COMMANDS = {
  * Generate Claude Code command file
  */
 function generateClaudeCommand(name, cmd) {
+  const hereFlag = HERE_COMMANDS.includes(name) ? ' --here' : '';
   const body = `${PREAMBLE}# /scratch:${name}
 
 ${cmd.description}
@@ -71,7 +75,7 @@ ${cmd.usage}
 This command executes the scratch CLI:
 
 \`\`\`bash
-node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name} $ARGUMENTS
+node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name}${hereFlag} $ARGUMENTS
 \`\`\`
 `;
 
@@ -85,6 +89,7 @@ node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name} $ARGUMENTS
  * Generate Cursor command file
  */
 function generateCursorCommand(name, cmd) {
+  const hereFlag = HERE_COMMANDS.includes(name) ? ' --here' : '';
   const body = `---
 description: ${cmd.description}
 ---
@@ -104,7 +109,7 @@ ${cmd.usage}
 This command runs the scratch CLI directly. Arguments are passed through.
 
 \`\`\`bash
-node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name} $ARGUMENTS
+node "${SCRATCH_CLI_PATH_PLACEHOLDER}" ${name}${hereFlag} $ARGUMENTS
 \`\`\`
 `;
 
@@ -147,13 +152,14 @@ export function registerScratch${name.charAt(0).toUpperCase() + name.slice(1)}Co
  * Generate VSCode tasks.json entry
  */
 function generateVSCodeTask(name, cmd) {
+  const cmdName = HERE_COMMANDS.includes(name) ? `${name} --here` : name;
   return {
     label: `Scratch: ${cmd.description}`,
     type: 'shell',
     command: 'node',
     args: [
       SCRATCH_CLI_PATH_PLACEHOLDER,
-      name
+      cmdName
     ],
     problemMatcher: [],
     presentation: {
