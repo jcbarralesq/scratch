@@ -30,6 +30,7 @@
     "bin/",
     "templates/",
     "default-registry.yaml",
+    "default-on-new.md",
     "README.md"
   ],
   "engines": {

@@ -1,0 +1,70 @@
+---
+description: Configurar proyecto recién creado desde plantilla de Despegar
+---
+
+Sos un desarrollador senior preparando el ambiente para un proyecto nuevo recién clonado desde una plantilla de Despegar. Tu objetivo es dejar el proyecto listo para que el usuario pueda empezar a trabajar: OpenSpec inicializado, skills instalados, `AGENTS.md` y `CLAUDE.md` generados, permisos base en su lugar.
+
+## Restricciones globales
+
+- El proyecto ya fue clonado y nombrado por el usuario (`scratch new <template> <name>`). No vuelvas a clonar.
+- Verificá que el directorio destino sea el correcto (el actual). Si hay archivos inesperados, no destruyas nada.
+- Escrituras atómicas: escribí a un archivo temporal en el mismo directorio y renombralo al destino.
+- Merge en vez de overwrite para `AGENTS.md`, `CLAUDE.md` y `.claude/settings.json` usando marcadores `<!-- AUTO-GENERATED: ...-start -->` / `<!-- AUTO-GENERATED: ...-end -->`. Si el archivo existe sin los marcadores (proyecto antiguo), pedí confirmación e insertálos.
+- Cada error incluye: qué falló, por qué, y qué hacer para recuperarse.
+- No avancés ante ambigüedad sin preguntar.
+
+## Ref pinneado
+
+**Repositorio de skills:** `despegar/agent-rules-and-skills` @ `v1.0.0`
+
+- Prompt 1 (análisis del proyecto): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/01-project-analysis.md`
+- Prompt 2 (sync de skills compartidos): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/02-skills-sync.md`
+- Prompt 3 (generación de skills customizados): `https://raw.githubusercontent.com/despegar/agent-rules-and-skills/v1.0.0/prompts/03-custom-skills.md`
+
+Los tres prompts se ejecutan en este flujo para que la cañería de skills custom quede armada desde el primer momento. Como el proyecto recién clonado tiene poca historia, el output del Prompt 3 puede ser básico — avisalo al usuario.
+
+## Flujo
+
+No seguís pasos mecánicos — leés el README del template y tomás las decisiones correctas.
+Usá un TodoWrite al inicio enumerando los pasos: OpenSpec init, skills sync, `.claude/settings.json`, generación de `CLAUDE.md`. Actualizalo a medida que avancés. Anunciá en el chat el inicio y resultado de cada operación larga.
+
+### Paso 1: Inicialización de OpenSpec
+
+El objetivo es que el proyecto tenga la estructura `openspec/` para el flujo spec-driven.
+
+Antes de ejecutar `openspec init`, verificá si la carpeta `openspec/` ya existe en el directorio del proyecto. Si existe, marcá el ítem del TodoWrite como completado con el mensaje `"openspec/ ya existe — paso omitido"` y continuá sin ejecutar nada.
+
+Si `openspec/` no existe, verificá que `openspec` esté disponible en el sistema. Si no lo está, reportá el error con las tres piezas: qué falló (`"No se encontró openspec en el sistema"`), por qué (`"El binario no está disponible en el PATH"`), cómo resolver (`npm install -g @fission-ai/openspec`). Marcá el ítem con error y continuá con los pasos restantes sin abortar el flujo.
+
+Si `openspec` está disponible, ejecutá `openspec init` en el directorio del proyecto y capturá el stderr y el código de salida. Si falla, reportá el error con las tres piezas: qué falló (`"Falló openspec init en <ruta>"`), por qué (el stderr del proceso hijo), cómo resolver. Para la remediación: si el directorio no contiene `.git/`, el comando es `git init && openspec init`; si `.git/` existe, el comando es `cd <ruta> && openspec init`. Marcá el ítem con error y continuá con los pasos restantes — no abortes el flujo.
+
+### Paso 2: Skills sync (Prompts 1+2+3)
+
+El objetivo es que el proyecto tenga `.claude/skills/` poblado (incluyendo skills customizados básicos) y `AGENTS.md` con los skills relevantes, dejando la cañería custom funcionando desde el clone inicial.
+Leé y ejecutá en orden el Prompt 1 (análisis), el Prompt 2 (skills compartidos) y el Prompt 3 (skills customizados) desde el ref pinneado. En un proyecto recién clonado no hay estado previo, así que mostrá el resumen sin pedir confirmación.
+
+El Prompt 3 puede generar skills mínimos por falta de historia de código — está bien.
+Avisá al usuario que el output puede ser básico y sugerí volver a correr la skills sync cuando el proyecto tenga más código real.
+
+Si algún prompt falla (repo inaccesible, permisos denegados): reportá el error con qué falló, por qué, y qué hacer (ej. "verificá que tu SSH key esté en GitHub y corré el sync de nuevo"). Continúá con los pasos restantes — no abortes todo el flujo.
+
+### Paso 3: Configuración de .claude/settings.json
+
+El objetivo es que el proyecto tenga permisos base para trabajar sin confirmaciones constantes.
+Si el template ya incluye un `settings.json`, hacé merge JSON: agregá las keys nuevas, preservá las existentes. Si detectás un conflicto (misma key, valor distinto), pedí confirmación.
+
+### Paso 4: Generación de CLAUDE.md
+
+El objetivo es que el proyecto tenga un `CLAUDE.md` que importe `AGENTS.md` y documente los skills instalados. Seguí el comportamiento del `/init` built-in de Claude Code: analizá el codebase, generá `CLAUDE.md` con la referencia a `AGENTS.md` escrita como `@AGENTS.md` (import recursivo de Claude Code), no como link markdown `[AGENTS.md](AGENTS.md)`. La diferencia es crítica: el import expande el contenido del archivo en el contexto de cada sesión; el link es texto inerte y no carga nada. Este paso corre después del skills sync para que `AGENTS.md` ya exista y el import sea válido.
+
+Envolvé la sección auto-generada con los marcadores `<!-- AUTO-GENERATED: claude-init-start -->` / `<!-- AUTO-GENERATED: claude-init-end -->`.
+
+Incluí en la sección auto-managed una subsección sobre `.claude/settings.json`: qué es, por qué afecta la velocidad de trabajo, cómo agregar un comando nuevo, y qué NO pre-aprobar (comandos destructivos, producción, estado compartido).
+
+## Cierre
+
+Mostrá un resumen escaneable: nombre del proyecto, ruta absoluta, cantidad de skills instalados, archivos generados (`AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`), y advertencias por pasos incompletos.
+
+Incluí en el mensaje de cierre un bloque educativo sobre `.claude/settings.json`: qué es, por qué importa para la velocidad, cómo agregar comandos nuevos, y qué no pre-aprobar.
+
+Si el paso de OpenSpec completó exitosamente, incluí también: `"OpenSpec inicializado — usá /opsx:propose para proponer tu primer cambio."` Si el paso falló u fue omitido, mencioná el estado e incluí el comando para corregirlo: `cd <ruta-del-proyecto> && openspec init`.

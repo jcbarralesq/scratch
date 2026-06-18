@@ -402,6 +402,9 @@ async function main() {
           }
         }
         
+        // Inject on_new prompt if available
+        injectOnNewPrompt(targetPath);
+        
         // Install dependencies if requested
         if (options.install !== false) {
           const packageJson = path.join(targetPath, 'package.json');
@@ -1045,6 +1048,34 @@ async function processTemplate(dir, variables) {
         fs.writeFileSync(currentPath, content);
       }
     }
+  }
+}
+
+// Inject on_new prompt into the new project
+function injectOnNewPrompt(targetPath) {
+  // Priority: user-defined ~/.scratch/on_new.md > bundled default-on-new.md
+  const userPrompt = path.join(CONFIG_DIR, 'on_new.md');
+  const defaultPrompt = path.join(__dirname, '..', 'default-on-new.md');
+  
+  let sourcePath = null;
+  if (fs.existsSync(userPrompt)) {
+    sourcePath = userPrompt;
+    printInfo('Using custom on_new.md from ~/.scratch/');
+  } else if (fs.existsSync(defaultPrompt)) {
+    sourcePath = defaultPrompt;
+  }
+  
+  if (!sourcePath) return; // no prompt to inject, silent skip
+  
+  const destDir = path.join(targetPath, '.scratch');
+  const destPath = path.join(destDir, 'INIT_PROMPT.md');
+  
+  try {
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(sourcePath, destPath);
+    printSuccess('Injected on_new prompt to .scratch/INIT_PROMPT.md');
+  } catch (err) {
+    printWarning(`Could not inject on_new prompt: ${err.message}`);
   }
 }
 

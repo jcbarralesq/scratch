@@ -7,6 +7,11 @@ const path = require('path');
 
 const SCRATCH_CLI_PATH_PLACEHOLDER = '__SCRATCH_CLI_PATH__';
 
+// Preamble included in every command: tells the agent to read INIT_PROMPT.md first
+const PREAMBLE = `> ⚠️ **Antes de responder:** Si existe \`.scratch/INIT_PROMPT.md\` en este proyecto, leélo primero y seguí esas instrucciones.
+
+`;
+
 // Command definitions
 const COMMANDS = {
   new: {
@@ -51,7 +56,7 @@ const COMMANDS = {
  * Generate Claude Code command file
  */
 function generateClaudeCommand(name, cmd) {
-  const body = `# /scratch:${name}
+  const body = `${PREAMBLE}# /scratch:${name}
 
 ${cmd.description}
 
@@ -84,7 +89,7 @@ function generateCursorCommand(name, cmd) {
 description: ${cmd.description}
 ---
 
-# /scratch:${name}
+${PREAMBLE}# /scratch:${name}
 
 ${cmd.description}
 
