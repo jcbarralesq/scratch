@@ -57,9 +57,15 @@ code .         # or: cursor .   or: claude
 /scratch:new mcp-template
 # This clones the template into the current directory
 # and injects .scratch/INIT_PROMPT.md for the agent to follow.
+
+# 6. (Optional) Check for new skills that could help this project
+# First run in the terminal:
+scratch update
+# Then in the agent:
+/scratch:update
 ```
 
-The `init` command shows a banner, asks which editor(s) to install for (Claude Code, Cursor, VS Code), and lists the available templates at the end.
+The `init` command shows a banner, asks which editor(s) to install for (Claude Code, Cursor, VS Code), and lists the available templates at the end. The `update` command injects a prompt that scans the agent-rules-and-skills catalog and suggests relevant skills for the project.
 
 ## Installation
 
