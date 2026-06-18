@@ -864,6 +864,13 @@ async function main() {
         console.log();
         clack.log.step('Available templates:');
         console.log();
+        
+        // Spinner before listing templates
+        s.start('Loading templates...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        s.stop('Templates loaded');
+        console.log();
+        
         const registry = loadRegistry();
         if (registry.templates && registry.templates.length > 0) {
           for (const t of registry.templates) {
@@ -881,6 +888,13 @@ async function main() {
         console.log();
         clack.log.step('Open your AI agent and run:');
         console.log();
+        
+        // Spinner before next steps
+        s.start('Preparing next steps...');
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        s.stop('Ready');
+        console.log();
+        
         console.log(`  ${chalk.cyan.bold('/scratch:new <template-name> --here')}`);
         console.log();
         console.log(chalk.gray('  This will clone the template into the current directory.'));

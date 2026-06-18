@@ -4,7 +4,6 @@
  */
 
 const clack = require('@clack/prompts');
-const ora = require('ora');
 const chalk = require('chalk');
 
 // ASCII banner — "FROM SCRATCH" stylized
@@ -139,7 +138,6 @@ async function withSteps(title, stepDefinitions, fn) {
 
 module.exports = {
   clack,
-  ora,
   chalk,
   showBanner,
   StepTracker,

@@ -25,8 +25,7 @@
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
     "inquirer": "^8.2.5",
-    "js-yaml": "^4.1.0",
-    "ora": "^9.4.0"
+    "js-yaml": "^4.1.0"
   },
   "files": [
     "bin/",
